@@ -1,0 +1,77 @@
+meta:
+  name: docker
+  version: 0.1.0
+  description: Docker container components
+  requires:
+    mgtt: ">=1.0"
+  command: "$MGTT_PROVIDER_DIR/bin/mgtt-provider-docker"
+
+hooks:
+  install: hooks/install.sh
+
+auth:
+  strategy: environment
+  reads_from:
+    - DOCKER_HOST
+    - /var/run/docker.sock
+  access:
+    probes: docker inspect (read-only)
+    writes: none
+
+types:
+  container:
+    description: A Docker container
+
+    facts:
+      running:
+        type: mgtt.bool
+        ttl: 10s
+        cost: low
+        access: docker socket read
+
+      restart_count:
+        type: mgtt.int
+        ttl: 10s
+        cost: low
+
+      health_status:
+        type: mgtt.string
+        ttl: 10s
+        cost: low
+        access: docker socket read
+
+      exit_code:
+        type: mgtt.int
+        ttl: 10s
+        cost: low
+
+    healthy:
+      - running == true
+      - restart_count < 5
+
+    states:
+      healthy:
+        when: "running == true & restart_count < 5"
+        description: running normally
+      degraded:
+        when: "running == true & restart_count >= 5"
+        description: running but restarting frequently
+      stopped:
+        when: "running == false & exit_code == 0"
+        description: exited cleanly
+      crashed:
+        when: "running == false & exit_code != 0"
+        description: exited with error
+      unknown:
+        when: "running == false"
+        description: not running (unknown reason)
+
+    default_active_state: healthy
+
+    failure_modes:
+      degraded:
+        can_cause: [timeout, upstream_failure]
+      stopped:
+        can_cause: [upstream_failure, connection_refused]
+      crashed:
+        can_cause: [upstream_failure, connection_refused]
