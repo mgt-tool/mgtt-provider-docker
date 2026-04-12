@@ -1,6 +1,6 @@
 # mgtt-provider-docker
 
-An [MGTT](https://github.com/sajonaro/mgtt) provider for Docker containers. Probes container status via `docker inspect`.
+An [`mgtt`](https://github.com/sajonaro/mgtt) provider for Docker containers. Probes container status via `docker inspect`.
 
 ## Install
 
@@ -8,9 +8,9 @@ An [MGTT](https://github.com/sajonaro/mgtt) provider for Docker containers. Prob
 mgtt provider install https://github.com/sajonaro/mgtt-provider-docker
 ```
 
-This clones the repo, builds the binary via the install hook, and registers the provider. Requires Go for the build step.
+Clones the repo, builds the binary via the install hook, and registers the provider. Requires Go for the build step.
 
-## What It Provides
+## What it provides
 
 **Type: `container`**
 
@@ -92,13 +92,13 @@ mgtt plan
 
 ## Requirements
 
-- [mgtt](https://github.com/sajonaro/mgtt) installed
+- [`mgtt`](https://github.com/sajonaro/mgtt) installed
 - Docker CLI in PATH
 - Access to the Docker socket (`/var/run/docker.sock`)
 - Go toolchain (for building during install)
 
 ## Links
 
-- [MGTT documentation](https://sajonaro.github.io/mgtt)
+- [`mgtt` documentation](https://sajonaro.github.io/mgtt)
 - [Provider authoring guide](https://sajonaro.github.io/mgtt/providers/overview/)
 - [Provider registry](https://sajonaro.github.io/mgtt/reference/registry/)
