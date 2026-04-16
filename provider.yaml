@@ -1,76 +1,107 @@
 meta:
   name: docker
-  version: 0.1.0
-  description: Docker container components
+  version: 0.2.0
+  description: Container health checks against a Docker daemon. Use for "is my container running, restarting too much, or healthy per its HEALTHCHECK?" invariants.
+  tags: [containers, runtime, docker]
   requires:
-    mgtt: ">=1.0"
+    mgtt: ">=0.1.4"
   command: "$MGTT_PROVIDER_DIR/bin/mgtt-provider-docker"
+
+# Backend version this provider is built against. Docker Engine's `inspect`
+# JSON shape has been stable across recent majors; we test against 25.x and
+# bound conservatively. Pre-20.x daemons emit a slightly different State
+# block and aren't supported.
+compatibility:
+  backend: docker
+  versions: ">=20.10,<27.0"
+  tested_against:
+    - "docker:25.0.5-dind@sha256:6b21c4cdc3d2a4f5e6acb46a8cb35e69e36f0c1b91afac3e90a30c8c7dbe9d7d"
+  notes: |
+    Provider shells out to the `docker` CLI (not the Engine API directly), so
+    it works against any DOCKER_HOST the operator's CLI is configured for —
+    local socket, remote daemon, Docker Desktop, rootless docker.
+    The container facts read from `docker inspect`'s State block; the shape
+    has been stable since 20.10 but pre-20.10 daemons emit a different layout
+    and aren't supported.
 
 hooks:
   install: hooks/install.sh
+  uninstall: hooks/uninstall.sh
 
 auth:
   strategy: environment
   reads_from:
     - DOCKER_HOST
     - /var/run/docker.sock
+    - ~/.docker/contexts/
   access:
     probes: docker inspect (read-only)
     writes: none
 
 types:
   container:
-    description: A Docker container
+    description: A Docker container — addressable by name or ID.
 
     facts:
       running:
         type: mgtt.bool
         ttl: 10s
-        cost: low
-        access: docker socket read
+        description: "true when the container is in the Running state"
+        probe: {cmd: "docker inspect {name}", parse: bool, cost: low}
 
       restart_count:
         type: mgtt.int
         ttl: 10s
-        cost: low
+        description: "number of restarts since the container was created"
+        probe: {cmd: "docker inspect {name}", parse: int, cost: low}
 
       health_status:
         type: mgtt.string
         ttl: 10s
-        cost: low
-        access: docker socket read
+        description: "HEALTHCHECK status (healthy/unhealthy/starting), or 'none' when not configured"
+        probe: {cmd: "docker inspect {name}", parse: string, cost: low}
 
       exit_code:
         type: mgtt.int
         ttl: 10s
-        cost: low
+        description: "exit code from the most recent container exit; 0 when running"
+        probe: {cmd: "docker inspect {name}", parse: int, cost: low}
+
+      uptime_seconds:
+        type: mgtt.int
+        ttl: 10s
+        description: "seconds since the container last started; 0 when never started"
+        probe: {cmd: "docker inspect {name}", parse: int, cost: low}
 
     healthy:
       - running == true
-      - restart_count < 5
+      - restart_count <= max_restart_count
+      - health_status != "unhealthy"
 
     states:
-      healthy:
-        when: "running == true & restart_count < 5"
-        description: running normally
-      degraded:
-        when: "running == true & restart_count >= 5"
-        description: running but restarting frequently
+      live:
+        when: 'running == true & restart_count <= max_restart_count & health_status != "unhealthy"'
+        description: container running and stable
+      flapping:
+        when: "running == true & restart_count > max_restart_count"
+        description: running but restarting more than max_restart_count
+      unhealthy:
+        when: 'running == true & health_status == "unhealthy"'
+        description: container's HEALTHCHECK is failing
       stopped:
-        when: "running == false & exit_code == 0"
+        when: 'running == false & exit_code == acceptable_exit_code'
         description: exited cleanly
       crashed:
-        when: "running == false & exit_code != 0"
-        description: exited with error
-      unknown:
-        when: "running == false"
-        description: not running (unknown reason)
+        when: 'running == false & exit_code != acceptable_exit_code'
+        description: exited with a non-acceptable code
 
-    default_active_state: healthy
+    default_active_state: live
 
     failure_modes:
-      degraded:
+      flapping:
         can_cause: [timeout, upstream_failure]
+      unhealthy:
+        can_cause: [upstream_failure, slow_response]
       stopped:
         can_cause: [upstream_failure, connection_refused]
       crashed:

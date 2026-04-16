@@ -1,0 +1,39 @@
+# A small self-hosted homelab — observed during the nightly database backup
+# window, when the steady-state model isn't the right contract because the
+# backup container is *expected* to exit (cleanly, with exit_code 0) and one
+# more "backup is healthy" invariant becomes load-bearing.
+#
+# Companion models:
+#   • homelab.model.yaml — steady-state (always loaded)
+#
+# Invoke this model from the backup cron job's success hook, or run it
+# manually on the morning after to verify last night's backup didn't fail
+# silently. The two changes from steady-state are:
+#
+#   1. db_backup component is added — a one-shot container that should
+#      have run within the window and exited cleanly.
+#   2. postgres's max_restart_count tightens to 0 — during the backup
+#      window the database is read-locked, so any restart here means the
+#      backup is wedging it.
+
+meta:
+  name: homelab-backup-window
+  version: "1.0"
+  providers:
+    - docker
+
+components:
+  postgres:
+    type: container
+    vars:
+      max_restart_count: 0                 # tighter than steady-state
+      acceptable_exit_code: 0
+    description: "during the backup window, postgres MUST stay up; any restart here is a wedge"
+
+  db_backup:
+    type: container
+    vars:
+      max_restart_count: 0                 # not a long-running container — restarts mean the backup is failing
+      acceptable_exit_code: 0              # last run should have exited cleanly
+    description: "the backup job — should have run within the window and exited 0"
+    depends_on: [postgres]

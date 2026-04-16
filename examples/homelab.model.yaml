@@ -1,0 +1,46 @@
+# A small self-hosted homelab — three containers running on a single host:
+# nginx fronting an app, with a postgres database. The baseline model — held
+# continuously, always loaded.
+#
+# Companion models:
+#   • homelab-backup-window.model.yaml — strict contract during the nightly db backup
+#
+# Each component is a contract per container:
+#   • max_restart_count       — how many restarts before "flapping"
+#   • acceptable_exit_code    — what counts as a clean exit (0 for normal,
+#                                non-zero for one-shot jobs that signal status)
+#
+# Usage:
+#   export MGTT_MODEL=examples/homelab.model.yaml
+#   mgtt plan --component app
+
+meta:
+  name: homelab
+  version: "1.0"
+  providers:
+    - docker
+
+components:
+  # The reverse proxy. Frequent restarts here are usually a config error
+  # in nginx.conf — tighter restart budget than the app.
+  nginx:
+    type: container
+    vars:
+      max_restart_count: 2
+      acceptable_exit_code: 0
+
+  # The application container. Tolerate a couple of restarts during
+  # rolling deploys but anything beyond that is a real problem.
+  app:
+    type: container
+    vars:
+      max_restart_count: 5
+      acceptable_exit_code: 0
+    depends_on: [postgres]
+
+  # The database. Should never be restarting on its own.
+  postgres:
+    type: container
+    vars:
+      max_restart_count: 1
+      acceptable_exit_code: 0
