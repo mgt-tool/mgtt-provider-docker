@@ -41,7 +41,7 @@ The runtime image base is `docker:cli` (official), which ships just the Docker c
 
 ## Capabilities
 
-When installed as an image, this provider declares the following runtime capabilities in [`provider.yaml`](./provider.yaml) (`image.needs`):
+When installed as an image, this provider declares the following runtime capabilities in [`provider.yaml`](./provider.yaml) (top-level `needs:`):
 
 | Capability | Effect at probe time |
 |---|---|
