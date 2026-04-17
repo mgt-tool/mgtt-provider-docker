@@ -49,7 +49,7 @@ When installed as an image, this provider declares the following runtime capabil
 
 **Security note:** the `docker` capability grants root-equivalent access to the host via the Docker socket (anything that can speak to `dockerd` can `docker run --privileged`). This is the same trust envelope as the git-install path — a host-installed Docker provider already has the socket — but for locked-down environments, add `MGTT_IMAGE_CAPS_DENY=docker` to refuse the forward. The probe will fail with a "cannot connect to docker daemon" message rather than silently succeed with wrong state.
 
-Operators targeting a remote daemon (no local socket) can override `docker` in `$MGTT_HOME/capabilities.yaml` to forward `DOCKER_HOST` / `DOCKER_TLS_VERIFY` / `DOCKER_CERT_PATH` instead. See the [full capabilities reference](https://github.com/mgt-tool/mgtt/blob/main/docs/reference/image-capabilities.md). Git-installed invocations don't go through this layer — the binary runs with the operator's full environment.
+For a remote daemon (no local socket), override the `docker` capability in `$MGTT_HOME/capabilities.yaml` to forward `DOCKER_HOST` / `DOCKER_TLS_VERIFY` / `DOCKER_CERT_PATH` instead of the socket. See the [capability reference](https://github.com/mgt-tool/mgtt/blob/main/docs/reference/image-capabilities.md).
 
 ## Auth
 
