@@ -34,16 +34,6 @@ hooks:
   install: hooks/install.sh
   uninstall: hooks/uninstall.sh
 
-auth:
-  strategy: environment
-  reads_from:
-    - DOCKER_HOST
-    - /var/run/docker.sock
-    - ~/.docker/contexts/
-  access:
-    probes: docker inspect (read-only)
-    writes: none
-
 types:
   container:
     description: A Docker container — addressable by name or ID.
