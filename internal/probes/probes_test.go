@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/mgt-tool/mgtt/sdk/provider"
-	"github.com/sajonaro/mgtt-provider-docker/internal/dockerclient"
+	"github.com/mgt-tool/mgtt-provider-docker/internal/dockerclient"
 )
 
 // fakeDocker swaps NewDockerConstructor for the duration of one test, with

@@ -20,7 +20,7 @@ meta:
   name: homelab-backup-window
   version: "1.0"
   providers:
-    - sajonaro/docker
+    - mgt-tool/docker
 
 components:
   postgres:
