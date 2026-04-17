@@ -1,6 +1,6 @@
 meta:
   name: docker
-  version: 0.2.0
+  version: 0.2.1
   description: Container health checks against a Docker daemon. Use for "is my container running, restarting too much, or healthy per its HEALTHCHECK?" invariants.
   tags: [containers, runtime, docker]
   requires:
