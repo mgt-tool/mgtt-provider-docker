@@ -20,7 +20,7 @@ Major restructure to align with the architecture used by sibling tracing provide
 
 ### Changed
 
-- **Module path** — `mgtt-provider-docker` → `github.com/sajonaro/mgtt-provider-docker` to match the registry entry.
+- **Module path** — `mgtt-provider-docker` → `github.com/mgt-tool/mgtt-provider-docker` to match the registry entry.
 - **`main.go`** is now 13 lines (was 138). All argv parsing, JSON output, and error mapping moved to the SDK.
 - **`states:` matrix** — added `unhealthy` (HEALTHCHECK failing) as a distinct state from `flapping`, since the operator response is different (read the app logs vs check the HEALTHCHECK script).
 

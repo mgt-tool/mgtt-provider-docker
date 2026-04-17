@@ -6,7 +6,7 @@ package main
 
 import (
 	"github.com/mgt-tool/mgtt/sdk/provider"
-	"github.com/sajonaro/mgtt-provider-docker/internal/probes"
+	"github.com/mgt-tool/mgtt-provider-docker/internal/probes"
 )
 
 func main() {

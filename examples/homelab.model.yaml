@@ -18,7 +18,7 @@ meta:
   name: homelab
   version: "1.0"
   providers:
-    - sajonaro/docker
+    - mgt-tool/docker
 
 components:
   # The reverse proxy. Frequent restarts here are usually a config error

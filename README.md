@@ -32,10 +32,10 @@ Two equivalent paths — pick whichever fits your workflow:
 mgtt provider install docker
 
 # Pre-built Docker image (no local toolchain, digest-pinned)
-mgtt provider install --image ghcr.io/sajonaro/mgtt-provider-docker:0.2.0@sha256:...
+mgtt provider install --image ghcr.io/mgt-tool/mgtt-provider-docker:0.2.0@sha256:...
 ```
 
-The image is published by [this repo's CI](./.github/workflows/docker.yml) on every push to `main` and every `v*` tag. Find the current digest on the [GHCR package page](https://github.com/sajonaro/mgtt-provider-docker/pkgs/container/mgtt-provider-docker).
+The image is published by [this repo's CI](./.github/workflows/docker.yml) on every push to `main` and every `v*` tag. Find the current digest on the [GHCR package page](https://github.com/mgt-tool/mgtt-provider-docker/pkgs/container/mgtt-provider-docker).
 
 The runtime image base is `docker:cli` (official), which ships just the Docker client — no daemon.
 
