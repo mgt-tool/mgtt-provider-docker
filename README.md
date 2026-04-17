@@ -37,7 +37,19 @@ mgtt provider install --image ghcr.io/sajonaro/mgtt-provider-docker:0.2.0@sha256
 
 The image is published by [this repo's CI](./.github/workflows/docker.yml) on every push to `main` and every `v*` tag. Find the current digest on the [GHCR package page](https://github.com/sajonaro/mgtt-provider-docker/pkgs/container/mgtt-provider-docker).
 
-The image ships with the Docker CLI on `docker:cli`. It declares `image.needs: [docker]` in `provider.yaml`; at probe time mgtt mounts the host Docker socket at `/var/run/docker.sock`, so the in-container CLI talks to the operator's daemon the same way a host-installed provider does. See [Image Capabilities](https://github.com/mgt-tool/mgtt/blob/main/docs/reference/image-capabilities.md) — and `MGTT_IMAGE_CAPS_DENY=docker` on locked-down hosts that refuse socket sharing.
+The runtime image base is `docker:cli` (official), which ships just the Docker client — no daemon.
+
+## Capabilities
+
+When installed as an image, this provider declares the following runtime capabilities in [`provider.yaml`](./provider.yaml) (`image.needs`):
+
+| Capability | Effect at probe time |
+|---|---|
+| `docker` | Mounts `/var/run/docker.sock` into the container so the in-container `docker` CLI talks to the operator's host daemon |
+
+**Security note:** the `docker` capability grants root-equivalent access to the host via the Docker socket (anything that can speak to `dockerd` can `docker run --privileged`). This is the same trust envelope as the git-install path — a host-installed Docker provider already has the socket — but for locked-down environments, add `MGTT_IMAGE_CAPS_DENY=docker` to refuse the forward. The probe will fail with a "cannot connect to docker daemon" message rather than silently succeed with wrong state.
+
+Operators targeting a remote daemon (no local socket) can override `docker` in `$MGTT_HOME/capabilities.yaml` to forward `DOCKER_HOST` / `DOCKER_TLS_VERIFY` / `DOCKER_CERT_PATH` instead. See the [full capabilities reference](https://github.com/mgt-tool/mgtt/blob/main/docs/reference/image-capabilities.md). Git-installed invocations don't go through this layer — the binary runs with the operator's full environment.
 
 ## Auth
 
