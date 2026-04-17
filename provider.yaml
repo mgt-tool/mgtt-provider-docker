@@ -7,6 +7,14 @@ meta:
     mgtt: ">=0.1.4"
   command: "$MGTT_PROVIDER_DIR/bin/mgtt-provider-docker"
 
+# Capabilities the image-installed form of this provider needs mgtt to
+# forward at probe time. Surfaced here (at the top, before types and
+# vocabulary) so anyone reading this file sees the runtime scope first —
+# the `docker` cap in particular grants access to the host Docker socket.
+# See mgtt docs/reference/image-capabilities.md for the full vocabulary.
+image:
+  needs: [docker]
+
 # Backend version this provider is built against. Docker Engine's `inspect`
 # JSON shape has been stable across recent majors; we test against 25.x and
 # bound conservatively. Pre-20.x daemons emit a slightly different State
@@ -106,8 +114,3 @@ types:
         can_cause: [upstream_failure, connection_refused]
       crashed:
         can_cause: [upstream_failure, connection_refused]
-
-# Capabilities the image-installed form of this provider needs mgtt to
-# forward at probe time. See mgtt docs/reference/image-capabilities.md.
-image:
-  needs: [docker]
