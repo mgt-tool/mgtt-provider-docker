@@ -8,7 +8,7 @@ Major restructure to align with the architecture used by sibling tracing provide
 
 ### Added
 
-- **`compatibility:` block in `provider.yaml`** — declares the backend versions this provider is built against (Docker `>=20.10, <27.0`), the exact tested image digest, and version-sensitive behaviors. README surfaces the contract prominently near the top.
+- **`compatibility:` block in `manifest.yaml`** — declares the backend versions this provider is built against (Docker `>=20.10, <27.0`), the exact tested image digest, and version-sensitive behaviors. README surfaces the contract prominently near the top.
 - **`internal/dockerclient/`** — thin shell wrapper around the `docker` CLI with timeout, classify-to-sentinel-error mapping (`No such container` → `ErrNotFound`, `cannot connect` → `ErrTransient`, `permission denied` → `ErrForbidden`, parse failures → `ErrProtocol`).
 - **`internal/probes/`** — ProbeFn-shaped probes consumed by `mgtt/sdk/provider`. Argv parsing, JSON output, and exit-code translation all come from the SDK.
 - **`uptime_seconds` fact** — seconds since the container last started; useful as a freshness signal for one-shot/cron containers.

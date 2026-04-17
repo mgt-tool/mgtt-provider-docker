@@ -18,5 +18,5 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /out/provider .
 
 FROM docker:cli
 COPY --from=build /out/provider /usr/local/bin/provider
-COPY provider.yaml /provider.yaml
+COPY manifest.yaml /manifest.yaml
 ENTRYPOINT ["/usr/local/bin/provider"]
