@@ -25,9 +25,19 @@ The provider shells out to the `docker` CLI (not the Engine API directly), so it
 
 ## Install
 
+Two equivalent paths — pick whichever fits your workflow:
+
 ```bash
+# Git + host toolchain (requires Go 1.25+)
 mgtt provider install docker
+
+# Pre-built Docker image (no local toolchain, digest-pinned)
+mgtt provider install --image ghcr.io/sajonaro/mgtt-provider-docker:0.2.0@sha256:...
 ```
+
+The image is published by [this repo's CI](./.github/workflows/docker.yml) on every push to `main` and every `v*` tag. Find the current digest on the [GHCR package page](https://github.com/sajonaro/mgtt-provider-docker/pkgs/container/mgtt-provider-docker).
+
+The image ships with the Docker CLI on `docker:cli`. It declares `image.needs: [docker]` in `provider.yaml`; at probe time mgtt mounts the host Docker socket at `/var/run/docker.sock`, so the in-container CLI talks to the operator's daemon the same way a host-installed provider does. See [Image Capabilities](https://github.com/mgt-tool/mgtt/blob/main/docs/reference/image-capabilities.md) — and `MGTT_IMAGE_CAPS_DENY=docker` on locked-down hosts that refuse socket sharing.
 
 ## Auth
 

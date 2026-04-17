@@ -106,3 +106,8 @@ types:
         can_cause: [upstream_failure, connection_refused]
       crashed:
         can_cause: [upstream_failure, connection_refused]
+
+# Capabilities the image-installed form of this provider needs mgtt to
+# forward at probe time. See mgtt docs/reference/image-capabilities.md.
+image:
+  needs: [docker]
