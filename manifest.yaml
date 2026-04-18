@@ -1,38 +1,32 @@
 meta:
   name: docker
-  version: 0.2.1
+  version: 1.0.0
   description: Container health checks against a Docker daemon. Use for "is my container running, restarting too much, or healthy per its HEALTHCHECK?" invariants.
   tags: [containers, runtime, docker]
   requires:
-    mgtt: ">=0.1.4"
-  command: "$MGTT_PROVIDER_DIR/bin/mgtt-provider-docker"
+    mgtt: ">=0.2.0"
 
 # Capabilities the provider needs at probe time — host packages
 # and credential chains. Image installs satisfy these via docker-run
 # bind mounts and env forwards; git installs inherit them from the
-# operator's shell. `network:` is a separate runtime-isolation knob.
+# operator's shell. `network_mode:` is a separate runtime-isolation knob.
 # See mgtt docs/reference/image-capabilities.md for the vocabulary.
-needs: [docker]
+#
 # Backend version this provider is built against. Docker Engine's `inspect`
 # JSON shape has been stable across recent majors; we test against 25.x and
 # bound conservatively. Pre-20.x daemons emit a slightly different State
 # block and aren't supported.
-compatibility:
-  backend: docker
-  versions: ">=20.10,<27.0"
-  tested_against:
-    - "docker:25.0.5-dind@sha256:6b21c4cdc3d2a4f5e6acb46a8cb35e69e36f0c1b91afac3e90a30c8c7dbe9d7d"
-  notes: |
-    Provider shells out to the `docker` CLI (not the Engine API directly), so
-    it works against any DOCKER_HOST the operator's CLI is configured for —
-    local socket, remote daemon, Docker Desktop, rootless docker.
-    The container facts read from `docker inspect`'s State block; the shape
-    has been stable since 20.10 but pre-20.10 daemons emit a different layout
-    and aren't supported.
+runtime:
+  needs: [docker]
+  backends:
+    docker: ">=20.10,<27.0"
 
-hooks:
-  install: hooks/install.sh
-  uninstall: hooks/uninstall.sh
+install:
+  source:
+    build: hooks/install.sh
+    clean: hooks/uninstall.sh
+  image:
+    repository: ghcr.io/mgt-tool/mgtt-provider-docker
 
 types:
   container:
