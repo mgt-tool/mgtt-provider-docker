@@ -1,6 +1,6 @@
 meta:
   name: docker
-  version: 1.0.0
+  version: 1.0.1
   description: Container health checks against a Docker daemon. Use for "is my container running, restarting too much, or healthy per its HEALTHCHECK?" invariants.
   tags: [containers, runtime, docker]
   requires:
@@ -19,7 +19,7 @@ meta:
 runtime:
   needs: [docker]
   backends:
-    docker: ">=20.10,<27.0"
+    docker: ">=20.10 <27.0"
 
 install:
   source:
