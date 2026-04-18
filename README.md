@@ -18,7 +18,7 @@ When `mgtt plan` walks this component, the provider asks the local Docker daemon
 | | |
 |---|---|
 | **Backend** | Docker Engine |
-| **Versions** | `>=20.10, <27.0` |
+| **Versions** | `>=20.10 <27.0` |
 | **Tested against** | `docker:25.0.5-dind` (digest pinned in integration tests) |
 
 The provider shells out to the `docker` CLI (not the Engine API directly), so it works against any `DOCKER_HOST` your CLI is already configured for — local socket, remote daemon, Docker Desktop, rootless docker. Pre-20.10 daemons emit a different `inspect` State block and aren't supported.
