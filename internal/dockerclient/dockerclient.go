@@ -1,3 +1,6 @@
+// Copyright (C) 2026 Alex Kunich
+// SPDX-License-Identifier: Apache-2.0
+
 // Package dockerclient wraps `docker inspect` with timeout and the
 // classify-to-sentinel-error mapping used by every docker-provider probe.
 //
