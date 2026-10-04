@@ -21,6 +21,18 @@ runtime:
   backends:
     docker: ">=20.10 <27.0"
 
+# Thresholds the type expressions compare facts against
+# (`restart_count <= max_restart_count`), set per component under vars:.
+# Declaring them is what lets `mgtt provider validate` tell them from
+# undeclared facts, and `mgtt model validate` warn when one is unset.
+variables:
+  max_restart_count:
+    description: restarts above this make a running container `flapping`; set per component
+    required: true
+  acceptable_exit_code:
+    description: exit code of a clean stop; any other makes a stopped container `crashed`; set per component
+    required: true
+
 install:
   source:
     build: hooks/install.sh
