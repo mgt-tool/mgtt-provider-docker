@@ -169,7 +169,7 @@ func TestRegistryWiresContainer(t *testing.T) {
 	r := provider.NewRegistry()
 	Register(r)
 	wantFacts := []string{"running", "restart_count", "health_status", "exit_code", "uptime_seconds"}
-	got := r.Facts("container")
+	got := factNames(types()["container"])
 	gotSet := map[string]bool{}
 	for _, f := range got {
 		gotSet[f] = true
@@ -179,4 +179,13 @@ func TestRegistryWiresContainer(t *testing.T) {
 			t.Errorf("registry missing container/%s", w)
 		}
 	}
+}
+
+// factNames lists the facts a type registers, from the provider's own table.
+func factNames(facts map[string]provider.ProbeFn) []string {
+	out := make([]string, 0, len(facts))
+	for name := range facts {
+		out = append(out, name)
+	}
+	return out
 }

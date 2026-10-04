@@ -19,8 +19,8 @@ import (
 //   - docker daemon down     → ErrTransient
 //   - permission denied      → ErrForbidden
 //   - parse failure          → ErrProtocol
-func registerContainer(r *provider.Registry) {
-	r.Register("container", map[string]provider.ProbeFn{
+func containerFacts() map[string]provider.ProbeFn {
+	return map[string]provider.ProbeFn{
 		"running": func(ctx context.Context, req provider.Request) (provider.Result, error) {
 			data, err := inspect(ctx, req)
 			if err != nil {
@@ -70,7 +70,7 @@ func registerContainer(r *provider.Registry) {
 			startedAt := stringFromMap(data, "", "State", "StartedAt")
 			return provider.IntResult(parseUptimeSeconds(startedAt)), nil
 		},
-	})
+	}
 }
 
 // inspect resolves the container name from req.Name and runs `docker inspect`.
